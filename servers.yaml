@@ -1,0 +1,7 @@
+---
+- servername: dev
+  box: ubuntu/trusty64
+  hostname:  dev
+  eth1: 192.168.200.10
+  mem: 2048
+  cpu: 1
