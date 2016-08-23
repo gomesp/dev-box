@@ -9,7 +9,7 @@ Vagrant.configure("2") do |config|
 
   if Vagrant.has_plugin?("vagrant-proxyconf")
     config.proxy.http     = "http://bit.datacom.co.nz:3128"
-    config.proxy.https    = "https://bit.datacom.co.nz:3128"
+    config.proxy.https    = "http://bit.datacom.co.nz:3128"
     config.proxy.no_proxy = "localhost,127.0.0.1"
   end
 
@@ -18,7 +18,7 @@ Vagrant.configure("2") do |config|
       config.vm.box = opts["box"]
       config.vm.hostname = opts["hostname"]
       config.vm.network :private_network, ip: opts["eth1"]
-      config.vm.provision "shell", path: "dev.sh"
+      config.vm.provision "puppet"
 
       config.vm.provider "virtualbox" do |v|
         v.name = opts["servername"]
