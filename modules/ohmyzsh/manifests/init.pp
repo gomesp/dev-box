@@ -1,53 +1,48 @@
-# == Class: ohmyzsh
-#
-# This is the ohmyzsh module. It installs oh-my-zsh for a user and changes
-# its shell to zsh.
-#
-# This module is called ohmyzsh as Puppet does not support hyphens in module
-# names.
-#
-# oh-my-zsh is a community-driven framework for managing your zsh configuration.
-#
-# === Parameters
-#
-# [*zsh*]
-#   define path to zsh binary
-#
-# [*home*]
-#   define root path of users homedirectory, default is /home.
-#
-#
-# === Examples
-#
-# class { 'ohmyzsh': }
-# ohmyzsh::install { 'acme': }
-# ohmyzsh::theme { 'acme': theme => 'clean' }
-# ohmyzsh::plugins { 'acme': plugins => 'git github' }
+# View README.md for full documentation.
 #
 # === Authors
 #
-# Leon Brocard <acme@astray.com>
+# Reuben Avery <ravery@bitswarm.io>
 #
 # === Copyright
 #
-# Copyright 2013 Leon Brocard
+# Copyright 2016 Bitswarm Labs
 #
 class ohmyzsh(
-  $zsh = $ohmyzsh::params::zsh,
-  $home = $ohmyzsh::params::home
+  $manage_zsh      = 'UNSET',
+  $manage_git      = 'UNSET',
 ) inherits ohmyzsh::params {
+  include 'ohmyzsh::config'
 
+  $_manage_zsh = $manage_zsh ? {
+    'UNSET' => $ohmyzsh::config::manage_zsh,
+    default => $manage_zsh,
+  }
 
-  if(!defined(Package['git'])) {
-    package { 'git':
-      ensure => present,
+  $_manage_git = $manage_git ? {
+    'UNSET' => $ohmyzsh::config::manage_git,
+    default => $manage_git,
+  }
+
+  anchor { 'ohmyzsh::begin': }
+
+  if str2bool($_manage_zsh) {
+    if ! defined(Package[$ohmyzsh::config::zsh_package_name]) {
+      package { $ohmyzsh::config::zsh_package_name:
+        ensure => present,
+      }
+      ~>Anchor['ohmyzsh::end']
     }
   }
 
-  if(!defined(Package['zsh'])) {
-    package { 'zsh':
-      ensure => present,
+  if str2bool($_manage_git) {
+    if ! defined(Package[$ohmyzsh::config::git_package_name]) {
+      package { $ohmyzsh::config::git_package_name:
+        ensure => present,
+      }
+      ~>Anchor['ohmyzsh::end']
     }
   }
 
+  anchor { 'ohmyzsh::end': }
 }

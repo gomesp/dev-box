@@ -18,7 +18,9 @@ Vagrant.configure("2") do |config|
       config.vm.box = opts["box"]
       config.vm.hostname = opts["hostname"]
       config.vm.network :private_network, ip: opts["eth1"]
-      config.vm.provision "puppet"
+      config.vm.provision "puppet" do |puppet|
+        puppet.module_path = "modules"
+      end
 
       config.vm.provider "virtualbox" do |v|
         v.name = opts["servername"]

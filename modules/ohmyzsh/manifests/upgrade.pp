@@ -1,4 +1,4 @@
-# == Class: ohmyzsh::upgrade
+# == Define: ohmyzsh::upgrade
 #
 # This is the ohmyzsh module. It installs oh-my-zsh for a user and changes
 # their shell to zsh. It has been tested under Ubuntu.
@@ -12,25 +12,40 @@
 #
 # None.
 #
-# === Examples
-#
-# class { 'ohmyzsh': }
-# ohmyzsh::install { 'acme': }
-#
 # === Authors
 #
-# Leon Brocard <acme@astray.com>
+# Reuben Avery <ravery@bitswarm.io>
 #
 # === Copyright
 #
-# Copyright 2013 Leon Brocard
+# Copyright 2016 Bitswarm Labs
 #
-define ohmyzsh::upgrade() {
-  if $name == 'root' { $home = '/root' } else { $home = "${ohmyzsh::params::home}/${name}" }
-  exec { "ohmyzsh::git upgrade ${name}":
-    command => '/usr/bin/git pull --rebase --stat origin master',
-    cwd     => "${home}/.oh-my-zsh",
-    user    => $name,
-    require => [Package['git'], Package['zsh']]
+define ohmyzsh::upgrade (
+  $schedule = 'daily',
+) {
+  include 'ohmyzsh::config'
+
+  if ! defined(Schedule['daily']) {
+    schedule { 'daily':
+      range  => '2 - 4',
+      period => 'daily',
+      repeat => 1,
+    }
   }
+
+  if $name == 'root' {
+    $home = '/root'
+  } else {
+    $home = "${ohmyzsh::config::home}/${name}"
+  }
+
+  exec { "ohmyzsh::git upgrade ${name}":
+    command  => 'git pull --rebase --stat origin master',
+    path     => ['/bin', '/usr/bin'],
+    cwd      => "${home}/.oh-my-zsh",
+    user     => $name,
+    schedule => $schedule,
+    require  => Package['git'],
+  }
+
 }

@@ -1,62 +1,63 @@
-# acme-ohmyzsh Puppet Module
+# puppet-ohmyzsh
 
-This is the [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh) module. It installs oh-my-zsh for a user and changes their shell to zsh. It also can configure themes and plugins for users.
+This is a [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh) module. It
+installs oh-my-zsh for a user and can change their shell to zsh. It can install
+and configure themes and plugins for users.
 
-oh-my-zsh is a community-driven framework for managing your zsh configuration. See [https://github.com/robbyrussell/oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh) for more details.
-
-This module is called ohmyzsh as Puppet does not support hyphens in module names.
-
-## Installation
-
-### From Puppet Forge
-
-```bash
-  $ puppet module install acme/ohmyzsh
-```
-
-### From source
-
-```bash
-  $ cd PUPPET_MODULEDIR
-  $ git clone https://github.com/acme/puppet-acme-oh-my-zsh ohmyzsh
-```
+oh-my-zsh is a community-driven framework for managing your zsh configuration.
+See [https://github.com/robbyrussell/oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh)
+for more details.
 
 ## Usage
 
-```
-class { 'ohmyzsh': }
+```puppet
+# disable management of zsh and git packages:
+class { 'ohmyzsh::config': manage_zsh => false, manage_git => false }
 
-# for a single user
-ohmyzsh::install { 'acme': }
+# install for a single user
+ohmyzsh::install { 'user1': }
 
-# for multiple users in one shot
-ohmyzsh::install { ['root', 'acme']: }
+# install for multiple users in one shot and set their shell to zsh
+ohmyzsh::install { ['root', 'user1']: set_sh => true }
+
+# install and disable automatic updating
+ohmyzsh::install { 'user2': disable_auto_update => true }
+
+# install and disable update prompt so updates are applied automatically
+ohmyzsh::install { 'user2': disable_update_prompt => true }
+
+# install a theme for a user
+ohmyzsh::fetch::theme { 'root': url => 'http://zanloy.com/files/dotfiles/oh-my-zsh/squared.zsh-theme' }
 
 # set a theme for a user
-ohmyzsh::theme { ['root', 'acme']: } # would install 'clean' theme as default
+ohmyzsh::theme { ['root', 'user1']: } # would install 'bitswarmops' theme as default
 
-ohmyzsh::theme { ['root', 'acme']: theme => 'robbyrussell' } # specific theme
+ohmyzsh::theme { ['root', 'user1']: theme => 'dpoggi' } # specific theme
 
-# activate plugins for a user
-ohmyzsh::plugins { 'acme': plugins => 'git github' }
+# changing the hostname slug of bitswarmops theme to use puppet fact:
+class { 'ohmyzsh::config': theme_hostname_slug => $::clientcert }
+ohmyzsh::theme { ['root', 'user1']: }
+
+# activate default plugins for a user
+ohmyzsh::plugins { 'user1': }
+
+# or activate specific plugins for a user
+ohmyzsh::plugins { 'user1': plugins => 'git github' }
 
 # upgrade oh-my-zsh for a single user
-ohmyzsh::upgrade { 'acme': }
+ohmyzsh::upgrade { 'user1': }
+
+# upgrade oh-my-zsh on a different schedule (only 'daily' is defined, you are responsible for creating additional schedules)
+ohmyzsh::upgrade { 'user1': schedule => 'weekly' }
 ```
-
-License
--------
-
-Apache License, Version 2.0.
-
-
-Contact
--------
-
-Leon Brocard acme@astray.com
-
 
 Support
 -------
 
-Please log tickets and issues at [GitHub](https://github.com/acme/puppet-acme-oh-my-zsh)
+Please log tickets and issues on [GitHub](https://github.com/bitswarmlabs/puppet-ohmyzsh)
+
+
+Acknowlegments
+--------------
+
+This module was originally a fork of [zanloy/ohmyzsh](https://github.com/zanloy/puppet-ohmyzsh) at version 1.0.4, itself a fork of [acme/ohmyzsh](https://github.com/acme/puppet-acme-oh-my-zsh) at version 0.1.3
