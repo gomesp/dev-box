@@ -7,10 +7,12 @@ servers = YAML.load_file('servers.yaml')
 
 Vagrant.configure("2") do |config|
 
+  config.vm.synced_folder "home/", "/home/vagrant/share"
+
   if Vagrant.has_plugin?("vagrant-proxyconf")
     config.proxy.http     = "http://bit.datacom.co.nz:3128"
     config.proxy.https    = "http://bit.datacom.co.nz:3128"
-    config.proxy.no_proxy = "localhost,127.0.0.1"
+    config.proxy.no_proxy = "localhost,127.0.0.1,*.datacom.co.nz,*.datacom.net.nz"
   end
 
   servers.each do |opts|
