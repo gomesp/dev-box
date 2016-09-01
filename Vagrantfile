@@ -18,11 +18,12 @@ Vagrant.configure("2") do |config|
   servers.each do |opts|
     config.vm.define opts["servername"] do |config|
       config.vm.box = opts["box"]
+      config.vm.box_version = opts["box_version"]
       config.vm.hostname = opts["hostname"]
       config.vm.network :private_network, ip: opts["eth1"]
-      config.vm.provision "puppet" do |puppet|
-        puppet.module_path = "modules"
-      end
+      config.vm.provision "shell", path: 'setup.sh'
+      config.vm.provision "shell", privileged: false, path: 'setup-vagrant-user.sh'
+      config.vm.provision "puppet", manifest_file: "default.pp"
 
       config.vm.provider "virtualbox" do |v|
         v.name = opts["servername"]

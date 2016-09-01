@@ -1,6 +1,7 @@
 ---
 - servername: dev
   box: puppetlabs/ubuntu-14.04-64-puppet
+  box_version: 1.0.1
   hostname:  dev
   eth1: 192.168.200.10
   mem: 2048
